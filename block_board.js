@@ -24,7 +24,7 @@ BlockBoard.prototype.add = function (options) {
   const y = parseInt(options.y)
   if (!this.storage[x]) this.storage[x] = []
   this.storage[x].push(y)
-  return {x: x, y: y}
+  return {x, y}
 }
 
 BlockBoard.prototype.remove = function (options) {
@@ -53,7 +53,7 @@ BlockBoard.prototype.move = function (options) {
   const y2 = parseInt(options.y2)
   this.remove({x: x1, y: y1})
   this.add({x: x2, y: y2})
-  return {x2: x2, y2: y2}
+  return {x2, y2}
 }
 
 BlockBoard.prototype._findMinMaxValues = function () {
@@ -70,12 +70,7 @@ BlockBoard.prototype._findMinMaxValues = function () {
       if (y > maxY) maxY = y
     })
   })
-  return {
-    minX: minX,
-    minY: minY,
-    maxX: maxX,
-    maxY: maxY
-  }
+  return {minX, minY, maxX, maxY}
 }
 
 BlockBoard.prototype.getRandomAdjacentXY = function () {
@@ -105,16 +100,16 @@ BlockBoard.prototype.getRandomBlock = function () {
   let y = undefined
   let columnHeight = 0
   const storageWidth = Object.keys(this.storage).length
-  while (!found) {
+  let counter = 0 // counter to avoid endless loops
+  while (!found && counter < 10000) {
     x = Math.floor(Math.random() * storageWidth)
     columnHeight = this.storage[x].length
     y = Math.floor(Math.random() * columnHeight)
     found = (x !== undefined && y !== undefined)
+    counter++
   }
-  return {
-    x: x,
-    y: y
-  }
+  if (counter === 10000) throw new Error('Too many failed attempts to get random block')
+  return {x, y}
 
   // TODO finish this
     // builds passed in data or this.storage

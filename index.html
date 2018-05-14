@@ -91,18 +91,7 @@
     // make blocks fall in descrete rows
     function calculateY (d) {
       const distanceFromRowEnd = d.rowTotal - d.column
-      // TODO make this part dry
-      if (distanceFromRowEnd <= 2) {
-        if (distanceFromRowEnd === 0) {
-          return svgHeight - 100
-        } else if (distanceFromRowEnd === 1) {
-          return svgHeight - 110
-        } else {
-          return svgHeight - 120
-        }
-      } else {
-        return item.attr('y')
-      }
+      return (distanceFromRowEnd <= 2) ? svgHeight - (100 + 10 * distanceFromRowEnd) : item.attr('y')
     }
 
     function calculateDelay (d) {
