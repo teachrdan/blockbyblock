@@ -1,0 +1,24 @@
+{
+  "name": "blockbyblock",
+  "version": "0.0.1",
+  "description": "Make programming data visualizations fun again! An object-oriented approach to block-based D3.js visualizations.",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/teachrdan/blockbyblock.git"
+  },
+  "keywords": [
+    "D3.js",
+    "visualization",
+    "objectoriented"
+  ],
+  "author": "Dan Tennery-Spalding",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/teachrdan/blockbyblock/issues"
+  },
+  "homepage": "https://github.com/teachrdan/blockbyblock#readme"
+}
