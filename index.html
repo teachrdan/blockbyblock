@@ -72,11 +72,6 @@
   const svgHeight = 750
   const svgWidth = 2000
 
-  // TODO move this to block_board.js
-  function clearBoard () {
-    d3.select('#svgParent').selectAll('*').remove()
-  }
-
   function addTransitionTime (n) {
     if (n >= startingFade) return (n - startingFade + 1) * 200
     return (pyramidHeight - startingFade + 1) * 200
@@ -162,29 +157,7 @@
     }
   }
 
-  // TODO fix this
-    // check if X and Y are backwards
-  function moveRandomBlockRandomly(options) {
-    const delay = d3.scaleLinear()
-      .domain([0, options.max])
-      .range([1000, 1500])
-    const bb = options.bb
-    const coordinates = bb.getRandomBlock()
-    const randomAdjacentCoordinates = bb.getRandomAdjacentXY()
-    bb.remove({x: coordinates.x, y: coordinates.y})
-    bb.add({x: randomAdjacentCoordinates.x, y: randomAdjacentCoordinates.y})
-    const block = d3.select(`#row${coordinates.x}column${coordinates.y}`)
-    console.log("block, coordinates.x, coordinates.y", block, coordinates.x, coordinates.y)
-    // console.log("block.attr('opacity')", block.attr('opacity'))
-    d3.select(`#row${coordinates.x}column${coordinates.y}`)
-      .attr('id', `row${randomAdjacentCoordinates.x}column${randomAdjacentCoordinates.y}`)
-      .attr('opacity', 0.5)
-      .transition()
-        .duration(500)
-        .attr('x', bb.calcXY(randomAdjacentCoordinates.x))
-        .attr('y', bb.calcXY(randomAdjacentCoordinates.y))
-  }
-
+  // TODO move to block_board.js
   function addRandomBlock(bb) {
     const randomAdjacentCoordinates = bb.getRandomAdjacentXY()
     bb.add({x: randomAdjacentCoordinates.x, y: randomAdjacentCoordinates.y})
@@ -212,8 +185,8 @@
   })
 
   buildBlockSquare({cb: dropBlocks, bb: blockBoard})
-  for (let i = 0; i < 4000; i++) {
-    moveRandomBlockRandomly({bb: blockBoard, idx: i, max: 10})
+  for (let i = 0; i < 100; i++) {
+    blockBoard.moveRandomBlockRandomly({max: 10})
   }
   </script>
   </body>

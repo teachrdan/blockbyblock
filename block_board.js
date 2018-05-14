@@ -1,20 +1,22 @@
 function BlockBoard (options) {
   this.storage = {} // storage['x'] = [y1, y2]
+
   this.blockSize = options.blockSize // pixels
-  this.linePadding = options.linePadding // pixels
   this.divider = options.divider // pixels
   this.dividerEvery = options.dividerEvery // rows or columns
-  this.startingX = options.startingX
+  this.linePadding = options.linePadding // pixels
   this.parent = options.parent
-  this.svgWidth = options.svgWidth
+  this.startingX = options.startingX
   this.svgHeight = options.svgHeight
+  this.svgWidth = options.svgWidth
+
   this.svg = d3.select(this.parent)
     .attr('width', this.svgWidth).attr('height', this.svgHeight)
-
 }
 
-BlockBoard.prototype.reset = function () {
+BlockBoard.prototype.clearBoard = function () {
   this.storage = {}
+  d3.select(this.parent).selectAll('*').remove()
 }
 
 BlockBoard.prototype.calcXY = function (num) {
@@ -33,6 +35,7 @@ BlockBoard.prototype.add = function (options) {
   return {x, y}
 }
 
+// TODO add calls to .add() here
 BlockBoard.prototype.build = function (options) {
   return this.svg.append('rect')
     .attr('id', `row${options.row}column${options.column}`)
@@ -128,18 +131,37 @@ BlockBoard.prototype.getRandomBlock = function () {
   }
   if (counter === 10000) throw new Error('Too many failed attempts to get random block')
   return {x, y}
+}
+// TODO finish this
+  // builds passed in data or this.storage
+BlockBoard.prototype.buildBlock = function () {
+  return svg.append('rect')
+    .attr('class', 'block')
+    .attr('id', `row${options.row}column${options.column}`)
+    .attr('height', blockSize)
+    .attr('width', blockSize)
+    .attr('x', options.x)
+    .attr('y', options.y)
+    .attr('opacity', defaultOpacity)
+    .attr('fill', '#FF7518')
+}
 
-  // TODO finish this
-    // builds passed in data or this.storage
-  BlockBoard.prototype.buildBlock = function () {
-    return svg.append('rect')
-      .attr('class', 'block')
-      .attr('id', `row${options.row}column${options.column}`)
-      .attr('height', blockSize)
-      .attr('width', blockSize)
-      .attr('x', options.x)
-      .attr('y', options.y)
-      .attr('opacity', defaultOpacity)
-      .attr('fill', '#FF7518')
-  }
+BlockBoard.prototype.moveRandomBlockRandomly = function (options) {
+  const delay = d3.scaleLinear()
+    .domain([0, options.max])
+    .range([1000, 1500])
+  const coordinates = this.getRandomBlock()
+  const randomAdjacentCoordinates = this.getRandomAdjacentXY()
+  this.remove({x: coordinates.x, y: coordinates.y})
+  this.add({x: randomAdjacentCoordinates.x, y: randomAdjacentCoordinates.y})
+  const block = d3.select(`#row${coordinates.x}column${coordinates.y}`)
+  console.log("block, coordinates.x, coordinates.y", block, coordinates.x, coordinates.y)
+  // console.log("block.attr('opacity')", block.attr('opacity'))
+  d3.select(`#row${coordinates.x}column${coordinates.y}`)
+    .attr('id', `row${randomAdjacentCoordinates.x}column${randomAdjacentCoordinates.y}`)
+    .attr('opacity', 0.5)
+    .transition()
+      .duration(500)
+      .attr('x', this.calcXY(randomAdjacentCoordinates.x))
+      .attr('y', this.calcXY(randomAdjacentCoordinates.y))
 }
