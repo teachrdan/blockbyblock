@@ -10,7 +10,7 @@
     <div class="cell">
       <div id="dashboardHeader" style="font-size: 20px">Header</div>
       <div>
-        <svg id='blockPyramid'></svg>
+        <svg id='svgParent'></svg>
       </div>
     </div>
   </div>
@@ -72,14 +72,10 @@
   const svgHeight = 750
   const svgWidth = 2000
 
-  const svg = d3.select('#blockPyramid').attr('transform', `translate(${margins.left}, ${margins.top})`)
-
+  // TODO move this to block_board.js
   function clearBoard () {
-    d3.select('#blockPyramid').selectAll('*').remove()
+    d3.select('#svgParent').selectAll('*').remove()
   }
-
-  svg.attr('width', svgWidth).attr('height', svgHeight)
-
 
   function addTransitionTime (n) {
     if (n >= startingFade) return (n - startingFade + 1) * 200
@@ -147,17 +143,6 @@
   const blockSquareWidth = 50
   const blockSquareHeight = 20
 
-  function buildBlock (options) {
-    return svg.append('rect')
-      .attr('id', `row${options.row}column${options.column}`)
-      .attr('height', blockSize)
-      .attr('width', blockSize)
-      .attr('x', options.x)
-      .attr('y', options.y)
-      .attr('opacity', defaultOpacity)
-      .attr('fill', '#FF7518')
-  }
-
   function buildBlockSquare (options) {
     let bb = options.bb
     let runningY = 0 // TODO make startingY a variable
@@ -168,7 +153,7 @@
         blockBoard.add({x: j, y: i})
         const x = bb.calcXY(j)
         const y =bb.calcXY(i)
-        const block = buildBlock({x: x, y: y, row: j, column: i})
+        const block = blockBoard.build({x, y, row: j, column: i})
         block.attr('class', (d) => 'row' + i)
           .datum(() => ({row:i + 1, column: j + 1, columnHeight: blockSquareHeight, rowLength: blockSquareWidth}))
         // options.cb(block)
@@ -190,7 +175,7 @@
     bb.add({x: randomAdjacentCoordinates.x, y: randomAdjacentCoordinates.y})
     const block = d3.select(`#row${coordinates.x}column${coordinates.y}`)
     console.log("block, coordinates.x, coordinates.y", block, coordinates.x, coordinates.y)
-    console.log("block.attr('opacity')", block.attr('opacity'))
+    // console.log("block.attr('opacity')", block.attr('opacity'))
     d3.select(`#row${coordinates.x}column${coordinates.y}`)
       .attr('id', `row${randomAdjacentCoordinates.x}column${randomAdjacentCoordinates.y}`)
       .attr('opacity', 0.5)
@@ -218,14 +203,17 @@
   let blockBoard = new BlockBoard({
     divider: 20,
     dividerEvery: 10,
-    blockSize: blockSize,
-    linePadding: linePadding,
-    startingX: 0
+    blockSize,
+    linePadding,
+    startingX: 0,
+    svgHeight,
+    svgWidth,
+    parent: '#svgParent'
   })
 
   buildBlockSquare({cb: dropBlocks, bb: blockBoard})
   for (let i = 0; i < 4000; i++) {
-    moveRandomBlockRandomly({bb: blockBoard, idx: i, max: 4000})
+    moveRandomBlockRandomly({bb: blockBoard, idx: i, max: 10})
   }
   </script>
   </body>

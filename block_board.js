@@ -5,6 +5,12 @@ function BlockBoard (options) {
   this.divider = options.divider // pixels
   this.dividerEvery = options.dividerEvery // rows or columns
   this.startingX = options.startingX
+  this.parent = options.parent
+  this.svgWidth = options.svgWidth
+  this.svgHeight = options.svgHeight
+  this.svg = d3.select(this.parent)
+    .attr('width', this.svgWidth).attr('height', this.svgHeight)
+
 }
 
 BlockBoard.prototype.reset = function () {
@@ -27,6 +33,16 @@ BlockBoard.prototype.add = function (options) {
   return {x, y}
 }
 
+BlockBoard.prototype.build = function (options) {
+  return this.svg.append('rect')
+    .attr('id', `row${options.row}column${options.column}`)
+    .attr('height', blockSize)
+    .attr('width', blockSize)
+    .attr('x', options.x)
+    .attr('y', options.y)
+    .attr('opacity', defaultOpacity)
+    .attr('fill', '#FF7518')
+}
 BlockBoard.prototype.remove = function (options) {
   const x = parseInt(options.x)
   const y = parseInt(options.y)
@@ -95,6 +111,8 @@ BlockBoard.prototype.getRandomAdjacentXY = function () {
 // TODO improve this "random" algo
   // TODO count all blocks and choose one
 BlockBoard.prototype.getRandomBlock = function () {
+  const blockCount = d3.select('block')
+  console.log("blockCount", blockCount)
   let found = false
   let x = undefined
   let y = undefined
@@ -115,6 +133,7 @@ BlockBoard.prototype.getRandomBlock = function () {
     // builds passed in data or this.storage
   BlockBoard.prototype.buildBlock = function () {
     return svg.append('rect')
+      .attr('class', 'block')
       .attr('id', `row${options.row}column${options.column}`)
       .attr('height', blockSize)
       .attr('width', blockSize)
