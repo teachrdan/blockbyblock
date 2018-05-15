@@ -138,14 +138,15 @@
   const blockSquareWidth = 50
   const blockSquareHeight = 20
 
+  // TODO make this work the new way
   function buildBlockSquare (options) {
     let bb = options.bb
     let runningY = 0 // TODO make startingY a variable
     let runningWidth = startingWidth
     for (let i = 0; i < blockSquareHeight; i++) {
-      // number of blocks wide the current row of the pyramid will be
+      // number of blocks wide the current row will be
       for (let j = 0; j < blockSquareWidth; j++) {
-        blockBoard.add({x: j, y: i})
+        // blockBoard.add({x: j, y: i})
         const x = bb.calcXY(j)
         const y =bb.calcXY(i)
         const block = blockBoard.build({x, y, row: j, column: i})
@@ -160,7 +161,7 @@
   // TODO move to block_board.js
   function addRandomBlock(bb) {
     const randomAdjacentCoordinates = bb.getRandomAdjacentXY()
-    bb.add({x: randomAdjacentCoordinates.x, y: randomAdjacentCoordinates.y})
+    this.add({x: randomAdjacentCoordinates.x, y: randomAdjacentCoordinates.y})
     let x = bb.calcXY(randomAdjacentCoordinates.x)
     let y = bb.calcXY(randomAdjacentCoordinates.y)
     const block = buildBlock({x: x, y: y})

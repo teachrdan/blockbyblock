@@ -1,16 +1,16 @@
 // TODO add feature to create passed in data?
 function BlockBoard (options) {
-  this.storage = {} // storage['x'] = [y1, y2]
+  this.storage = {} // storage['rowX'] = [columnY1, columnY2]
 
-  this.blockSize = options.blockSize || 9// pixels
-  this.divider = options.divider || 10 // pixels
+  this.blockSize = options.blockSize || 9 // pixels
+  this.divider = options.divider || 20 // pixels
   this.dividerEvery = options.dividerEvery || 10 // rows or columns
   this.linePadding = options.linePadding || 1 // pixels
   this.opacity = options.opacity || 0.2
   this.parent = options.parent || 'body'
   this.startingX = options.startingX || 0
-  this.svgHeight = options.svgHeight || 500
-  this.svgWidth = options.svgWidth || 1000
+  this.svgHeight = options.svgHeight || 500 // pixels
+  this.svgWidth = options.svgWidth || 1000 // pixels
 
   this.svg = d3.select(this.parent)
     .attr('width', this.svgWidth).attr('height', this.svgHeight)
@@ -37,8 +37,9 @@ BlockBoard.prototype.add = function (options) {
   return {x, y}
 }
 
-// TODO add calls to .add() here
+// TODO fix this
 BlockBoard.prototype.build = function (options) {
+  this.add({x: options.row, y: options.column})
   return this.svg.append('rect')
     .attr('id', `row${options.row}column${options.column}`)
     .attr('height', this.blockSize)
@@ -48,6 +49,7 @@ BlockBoard.prototype.build = function (options) {
     .attr('opacity', this.opacity)
     .attr('fill', '#FF7518')
 }
+
 BlockBoard.prototype.remove = function (options) {
   const x = parseInt(options.x)
   const y = parseInt(options.y)
@@ -151,13 +153,12 @@ BlockBoard.prototype.buildBlock = function () {
 BlockBoard.prototype.moveRandomBlockRandomly = function (options) {
   const delay = d3.scaleLinear()
     .domain([0, options.max])
-    .range([1000, 1500])
+    .range([1000, 1500]) // TODO make these variables
   const coordinates = this.getRandomBlock()
   const randomAdjacentCoordinates = this.getRandomAdjacentXY()
   this.remove({x: coordinates.x, y: coordinates.y})
   this.add({x: randomAdjacentCoordinates.x, y: randomAdjacentCoordinates.y})
   const block = d3.select(`#row${coordinates.x}column${coordinates.y}`)
-  console.log("block, coordinates.x, coordinates.y", block, coordinates.x, coordinates.y)
   // console.log("block.attr('opacity')", block.attr('opacity'))
   d3.select(`#row${coordinates.x}column${coordinates.y}`)
     .attr('id', `row${randomAdjacentCoordinates.x}column${randomAdjacentCoordinates.y}`)
