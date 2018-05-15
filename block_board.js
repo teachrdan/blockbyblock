@@ -1,14 +1,16 @@
+// TODO add feature to create passed in data?
 function BlockBoard (options) {
   this.storage = {} // storage['x'] = [y1, y2]
 
-  this.blockSize = options.blockSize // pixels
-  this.divider = options.divider // pixels
-  this.dividerEvery = options.dividerEvery // rows or columns
-  this.linePadding = options.linePadding // pixels
-  this.parent = options.parent
-  this.startingX = options.startingX
-  this.svgHeight = options.svgHeight
-  this.svgWidth = options.svgWidth
+  this.blockSize = options.blockSize || 9// pixels
+  this.divider = options.divider || 10 // pixels
+  this.dividerEvery = options.dividerEvery || 10 // rows or columns
+  this.linePadding = options.linePadding || 1 // pixels
+  this.opacity = options.opacity || 0.2
+  this.parent = options.parent || 'body'
+  this.startingX = options.startingX || 0
+  this.svgHeight = options.svgHeight || 500
+  this.svgWidth = options.svgWidth || 1000
 
   this.svg = d3.select(this.parent)
     .attr('width', this.svgWidth).attr('height', this.svgHeight)
@@ -39,11 +41,11 @@ BlockBoard.prototype.add = function (options) {
 BlockBoard.prototype.build = function (options) {
   return this.svg.append('rect')
     .attr('id', `row${options.row}column${options.column}`)
-    .attr('height', blockSize)
-    .attr('width', blockSize)
+    .attr('height', this.blockSize)
+    .attr('width', this.blockSize)
     .attr('x', options.x)
     .attr('y', options.y)
-    .attr('opacity', defaultOpacity)
+    .attr('opacity', this.opacity)
     .attr('fill', '#FF7518')
 }
 BlockBoard.prototype.remove = function (options) {
