@@ -56,102 +56,35 @@
   <script type="text/javascript" src="block_board.js"></script>
   <script>
   // magic numbers
-  const blockSize = 19 // 9px by 9px
-  const defaultOpacity = 0.7
-  const defaultFadedOpacity = 0.2
-  const pyramidHeight = 40 // number of rows
-  const lineGrowBy = 20 // number of pixels grown / row
-  const lineHeight = 10 // number of pixels
+  const blockSize = 14 // 19px by 19px
+  const blockSquareHeight = 20 // 20 rows tall
+  const blockSquareWidth = 50 // 50 columns wide
+  const defaultOpacity = 0.7 // decimel for CSS
+  const defaultFadedOpacity = 0.2 // decimel for CSS
+  const divider = 20 // pixels width between blocks of blocks
+  const dividerEvery = 10 // 10 rows x 10 columns in each block
   const linePadding = 1 // number of pixels
   const margins = {
     top: 20,
     left: 0
   }
-  const startingFade = 25 // row number
   const startingWidth = 10
   const svgHeight = 750
   const svgWidth = 2000
-
-  function addTransitionTime (n) {
-    if (n >= startingFade) return (n - startingFade + 1) * 200
-    return (pyramidHeight - startingFade + 1) * 200
-  }
-
-  // TODO make it DRY to change the # of blocks removed
-  function narrowBlockTransition (item) {
-    // make blocks fall in descrete rows
-    function calculateY (d) {
-      const distanceFromRowEnd = d.rowTotal - d.column
-      return (distanceFromRowEnd <= 2) ? svgHeight - (100 + 10 * distanceFromRowEnd) : item.attr('y')
-    }
-
-    function calculateDelay (d) {
-      const distanceFromRowEnd = d.rowTotal - d.column
-      let delayMS = (40 - d.row) * 80
-      return delayMS - (3 - distanceFromRowEnd) * 500
-    }
-
-    item.transition()
-      .delay((d) => calculateDelay(d))
-      .duration(3000)
-      .attr('y', (d) => calculateY(d))
-  }
-
-  // TODO make it DRY to change the # of blocks removed
-  function bottomBlockTransition (item, numRows = 3) {
-    // make blocks fall in descrete rows
-    function calculateY (d) {
-      const distanceFromBottom = pyramidHeight - d.row
-      if (distanceFromBottom <= numRows) {
-        return svgHeight - 300 - (distanceFromBottom * 10)
-      } else {
-        return item.attr('y')
-      }
-    }
-
-    function calculateDelay (d) {
-      const distanceFromBottom = pyramidHeight - d.row
-      return distanceFromBottom * 80
-    }
-
-    item.transition()
-      .delay((d) => calculateDelay(d))
-      .duration(3000)
-      .attr('y', (d) => calculateY(d))
-      .attr('opacity', (d) => (pyramidHeight - d.row <= numRows) ? defaultFadedOpacity : defaultOpacity)
-  }
-
-  function moveXY (d, y) {
-    return (d.row > 15 && d.column > 40) ? svgHeight : y
-  }
-
-  // TODO add easing
-  // TODO move them to other columns
-  function dropBlocks (item) {
-    const y = item.attr('y')
-    item.transition()
-      .duration(2000)
-      .delay((d) => (21 - d.row) * 100 + (41 - d.column) * 50)
-      .attr('y', (d) => moveXY(d, y))
-  }
-
-  const blockSquareWidth = 50
-  const blockSquareHeight = 20
 
   // TODO make this work the new way
   function buildBlockSquare (options) {
     let bb = options.bb
     let runningY = 0 // TODO make startingY a variable
     let runningWidth = startingWidth
-    for (let i = 0; i < blockSquareHeight; i++) {
+    for (let column = 0; column < blockSquareHeight; column++) {
       // number of blocks wide the current row will be
-      for (let j = 0; j < blockSquareWidth; j++) {
-        // blockBoard.add({x: j, y: i})
-        const x = bb.calcXY(j)
-        const y =bb.calcXY(i)
-        const block = blockBoard.build({x, y, row: j, column: i})
-        block.attr('class', (d) => 'row' + i)
-          .datum(() => ({row:i + 1, column: j + 1, columnHeight: blockSquareHeight, rowLength: blockSquareWidth}))
+      for (let row = 0; row < blockSquareWidth; row++) {
+        const x = bb.calcXY(row)
+        const y =bb.calcXY(column)
+        const block = blockBoard.build({x, y, row: row, column: column})
+        block.attr('class', (d) => 'row' + row)
+          .datum(() => ({row, column, columnHeight: blockSquareHeight, rowLength: blockSquareWidth}))
         // options.cb(block)
       }
       runningY += blockSize + linePadding
@@ -167,16 +100,16 @@
     const block = buildBlock({x: x, y: y})
     block
       .datum(() => ({
-        row: randomAdjacentCoordinates.y + 1,
-        column: randomAdjacentCoordinates.x + 1,
+        row: randomAdjacentCoordinates.y,
+        column: randomAdjacentCoordinates.x,
         columnHeight: blockSquareHeight,
         rowLength: blockSquareWidth
       }))
   }
 
   let blockBoard = new BlockBoard({
-    divider: 20,
-    dividerEvery: 10,
+    divider,
+    dividerEvery,
     blockSize,
     linePadding,
     startingX: 0,
@@ -185,7 +118,7 @@
     parent: '#svgParent'
   })
 
-  buildBlockSquare({cb: dropBlocks, bb: blockBoard})
+  buildBlockSquare({bb: blockBoard})
   for (let i = 0; i < 100; i++) {
     blockBoard.moveRandomBlockRandomly({max: 10})
   }

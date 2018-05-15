@@ -118,8 +118,6 @@ BlockBoard.prototype.getRandomAdjacentXY = function () {
 // TODO improve this "random" algo
   // TODO count all blocks and choose one
 BlockBoard.prototype.getRandomBlock = function () {
-  const blockCount = d3.select('block')
-  console.log("blockCount", blockCount)
   let found = false
   let x = undefined
   let y = undefined
