@@ -1,9 +1,9 @@
 const d3 = window.d3
-// TODO add feature to create passed in data?
 function BlockBoard (options) {
   this.storage = {} // storage['rowX'] = [columnY1, columnY2]
 
   this.blockSize = options.blockSize || 9 // pixels
+  this.data = options.data
   this.divider = options.divider || 20 // pixels
   this.dividerEvery = options.dividerEvery || 10 // rows or columns
   this.linePadding = options.linePadding || 1 // pixels
@@ -15,6 +15,17 @@ function BlockBoard (options) {
 
   this.svg = d3.select(this.parent)
     .attr('width', this.svgWidth).attr('height', this.svgHeight)
+
+  if (this.data) this.showData()
+}
+
+BlockBoard.prototype.showData = function () {
+  // TODO iterate over rows
+  Object.keys(this.data).forEach(row => {
+    this.data[row].forEach(column => {
+      this.build({row, column})
+    })
+  })
 }
 
 BlockBoard.prototype.clearBoard = function () {
@@ -31,22 +42,25 @@ BlockBoard.prototype._checkOpen = function (x, y) {
 }
 
 BlockBoard.prototype.add = function (options) {
-  const x = parseInt(options.x)
-  const y = parseInt(options.y)
-  if (!this.storage[x]) this.storage[x] = []
-  this.storage[x].push(y)
-  return {x, y}
+  const row = parseInt(options.row)
+  const column = parseInt(options.column)
+  if (!this.storage[row]) this.storage[row] = []
+  this.storage[row].push(column)
+  return {row, column}
 }
 
-// TODO fix this
+// TODO make this work with passed in starting data
 BlockBoard.prototype.build = function (options) {
-  this.add({x: options.row, y: options.column})
+  this.add({row: options.row, column: options.column})
+  const x = this.calcXY(options.row)
+  const y =this.calcXY(options.column)
+
   return this.svg.append('rect')
     .attr('id', `row${options.row}column${options.column}`)
     .attr('height', this.blockSize)
     .attr('width', this.blockSize)
-    .attr('x', options.x)
-    .attr('y', options.y)
+    .attr('x', x)
+    .attr('y', y)
     .attr('opacity', this.opacity)
     .attr('fill', '#FF7518')
 }
@@ -76,7 +90,7 @@ BlockBoard.prototype.move = function (options) {
   const x2 = parseInt(options.x2)
   const y2 = parseInt(options.y2)
   this.remove({x: x1, y: y1})
-  this.add({x: x2, y: y2})
+  this.add({row: x2, column: y2})
   return {x2, y2}
 }
 
@@ -135,16 +149,20 @@ BlockBoard.prototype.getRandomBlock = function () {
   if (counter === 10000) throw new Error('Too many failed attempts to get random block')
   return {x, y}
 }
+
 // TODO finish this
   // builds passed in data or this.storage
 BlockBoard.prototype.buildBlock = function (options) {
+  const x = this.calcXY(options.row)
+  const y =this.calcXY(options.column)
+
   return this.svg.append('rect')
     .attr('class', 'block')
     .attr('id', `row${options.row}column${options.column}`)
     .attr('height', this.blockSize)
     .attr('width', this.blockSize)
-    .attr('x', options.x)
-    .attr('y', options.y)
+    .attr('x', x)
+    .attr('y', y)
     .attr('opacity', this.opacity)
     .attr('fill', '#FF7518')
 }
@@ -156,7 +174,7 @@ BlockBoard.prototype.moveRandomBlockRandomly = function (options) {
   const coordinates = this.getRandomBlock()
   const randomAdjacentCoordinates = this.getRandomAdjacentXY()
   this.remove({x: coordinates.x, y: coordinates.y})
-  this.add({x: randomAdjacentCoordinates.x, y: randomAdjacentCoordinates.y})
+  this.add({row: randomAdjacentCoordinates.x, column: randomAdjacentCoordinates.y})
   // const block = d3.select(`#row${coordinates.x}column${coordinates.y}`)
   // console.log("block.attr('opacity')", block.attr('opacity'))
   d3.select(`#row${coordinates.x}column${coordinates.y}`)

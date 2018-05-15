@@ -72,7 +72,6 @@
   const svgHeight = 750
   const svgWidth = 2000
 
-  // TODO make this work the new way
   function buildBlockSquare (options) {
     let bb = options.bb
     let runningY = 0 // TODO make startingY a variable
@@ -80,9 +79,7 @@
     for (let column = 0; column < blockSquareHeight; column++) {
       // number of blocks wide the current row will be
       for (let row = 0; row < blockSquareWidth; row++) {
-        const x = bb.calcXY(row)
-        const y =bb.calcXY(column)
-        const block = blockBoard.build({x, y, row: row, column: column})
+        const block = blockBoard.build({row: row, column: column})
         block.attr('class', (d) => 'row' + row)
           .datum(() => ({row, column, columnHeight: blockSquareHeight, rowLength: blockSquareWidth}))
         // options.cb(block)
