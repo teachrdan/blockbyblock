@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/teachrdan/blockbyblock/issues"
   },
-  "homepage": "https://github.com/teachrdan/blockbyblock#readme"
+  "homepage": "https://github.com/teachrdan/blockbyblock#readme",
+  "devDependencies": {
+    "standard": "^11.0.1"
+  }
 }

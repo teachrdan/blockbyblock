@@ -1,3 +1,4 @@
+const d3 = window.d3
 // TODO add feature to create passed in data?
 function BlockBoard (options) {
   this.storage = {} // storage['rowX'] = [columnY1, columnY2]
@@ -25,8 +26,8 @@ BlockBoard.prototype.calcXY = function (num) {
   let baseX = this.startingX + num * (this.blockSize + this.linePadding)
   return baseX + Math.floor(num / this.dividerEvery) * this.divider
 }
-BlockBoard.prototype._checkOpen = function (x ,y) {
-  return (!this.storage[x] || !this.storage[x].includes(parseInt(y))) ? true : false
+BlockBoard.prototype._checkOpen = function (x, y) {
+  return (!this.storage[x] || !this.storage[x].includes(parseInt(y)))
 }
 
 BlockBoard.prototype.add = function (options) {
@@ -62,8 +63,8 @@ BlockBoard.prototype._checkAdjacent = function (options) {
   const x = parseInt(options.x)
   const y = parseInt(options.y)
   if (this.storage[x] && this.storage[x].includes(y)) return false // returns false if block is not free
-  if (this.storage[x-1] && this.storage[x-1][y]) return true
-  if (this.storage[x+1] && this.storage[x+1][y]) return true
+  if (this.storage[x - 1] && this.storage[x - 1][y]) return true
+  if (this.storage[x + 1] && this.storage[x + 1][y]) return true
   if (this.storage[x] && this.storage[x].includes(y - 1)) return true
   if (this.storage[x] && this.storage[x].includes(y + 1)) return true
   return false
@@ -98,8 +99,8 @@ BlockBoard.prototype._findMinMaxValues = function () {
 
 BlockBoard.prototype.getRandomAdjacentXY = function () {
   let found = false
-  let randomX = undefined
-  let randomY = undefined
+  let randomX
+  let randomY
   const minMaxValues = this._findMinMaxValues()
   // NOTE: add 1 to find an open adjacent block
   const xRange = minMaxValues.maxX - minMaxValues.minX + 1
@@ -119,8 +120,8 @@ BlockBoard.prototype.getRandomAdjacentXY = function () {
   // TODO count all blocks and choose one
 BlockBoard.prototype.getRandomBlock = function () {
   let found = false
-  let x = undefined
-  let y = undefined
+  let x
+  let y
   let columnHeight = 0
   const storageWidth = Object.keys(this.storage).length
   let counter = 0 // counter to avoid endless loops
@@ -136,27 +137,27 @@ BlockBoard.prototype.getRandomBlock = function () {
 }
 // TODO finish this
   // builds passed in data or this.storage
-BlockBoard.prototype.buildBlock = function () {
-  return svg.append('rect')
+BlockBoard.prototype.buildBlock = function (options) {
+  return this.svg.append('rect')
     .attr('class', 'block')
     .attr('id', `row${options.row}column${options.column}`)
-    .attr('height', blockSize)
-    .attr('width', blockSize)
+    .attr('height', this.blockSize)
+    .attr('width', this.blockSize)
     .attr('x', options.x)
     .attr('y', options.y)
-    .attr('opacity', defaultOpacity)
+    .attr('opacity', this.opacity)
     .attr('fill', '#FF7518')
 }
 
 BlockBoard.prototype.moveRandomBlockRandomly = function (options) {
-  const delay = d3.scaleLinear()
-    .domain([0, options.max])
-    .range([1000, 1500]) // TODO make these variables
+  // const delay = d3.scaleLinear()
+  //   .domain([0, options.max])
+  //   .range([1000, 1500]) // TODO make these variables
   const coordinates = this.getRandomBlock()
   const randomAdjacentCoordinates = this.getRandomAdjacentXY()
   this.remove({x: coordinates.x, y: coordinates.y})
   this.add({x: randomAdjacentCoordinates.x, y: randomAdjacentCoordinates.y})
-  const block = d3.select(`#row${coordinates.x}column${coordinates.y}`)
+  // const block = d3.select(`#row${coordinates.x}column${coordinates.y}`)
   // console.log("block.attr('opacity')", block.attr('opacity'))
   d3.select(`#row${coordinates.x}column${coordinates.y}`)
     .attr('id', `row${randomAdjacentCoordinates.x}column${randomAdjacentCoordinates.y}`)
