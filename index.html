@@ -9,9 +9,16 @@
     </div>
     <div class="cell">
       <div id="dashboardHeader" style="font-size: 20px">Header</div>
-      <div>
-        <svg id='svgParent'></svg>
-      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="cell" style="width:100%; padding: 20px">
+      <svg id='svgParent1'></svg>
+    </div>
+  </div>
+  <div class="row">
+    <div class="cell" style="width:100%; padding: 20px">
+      <svg id='svgParent2'></svg>
     </div>
   </div>
   <script src="https://d3js.org/d3.v5.min.js"></script>
@@ -19,23 +26,6 @@
     body {
       font-family: "Open Sans", sans-serif;
       font-size: 13px;
-    }
-    .title {
-      padding-left: 10px;
-      padding-bottom: 12px;
-      padding-top: 10px;
-      font-size: 18px;
-      color: #787878;
-      border-bottom: 1px solid rgb(240, 239, 241)
-    }
-    .headers {
-      padding-left: 10px;
-      padding-bottom: 6px;
-      padding-top: 4px;
-      font-family: "Lato", sans-serif;
-      font-size: 11px;
-      color: #787878;
-      border-bottom: 1px solid rgb(240, 239, 241)
     }
     .row {
       display: table;
@@ -45,29 +35,19 @@
     .cell {
       display: table-cell;
     }
-    .barCell {
-      border-bottom: 1px solid rgb(240, 239, 241)
-    }
-    .icon {
-      top: 50%;
-      padding-left: 22px;
-    }
   </style>
   <script type="text/javascript" src="block_board.js"></script>
   <script>
   // magic numbers
   const blockSize = 14 // 19px by 19px
-  const blockSquareHeight = 20 // 20 rows tall
-  const blockSquareWidth = 50 // 50 columns wide
+  const blockSquareHeight = 10 // 20 rows tall
+  const blockSquareWidth = 20 // 50 columns wide
   const defaultOpacity = 0.7 // decimel for CSS
   const defaultFadedOpacity = 0.2 // decimel for CSS
   const divider = 20 // pixels width between blocks of blocks
   const dividerEvery = 10 // 10 rows x 10 columns in each block
   const linePadding = 1 // number of pixels
-  const margins = {
-    top: 20,
-    left: 0
-  }
+  const orange = '#FF7518'
   const startingWidth = 10
   const svgHeight = 750
   const svgWidth = 2000
@@ -79,7 +59,7 @@
     for (let column = 0; column < blockSquareHeight; column++) {
       // number of blocks wide the current row will be
       for (let row = 0; row < blockSquareWidth; row++) {
-        const block = blockBoard.build({row: row, column: column})
+        const block = blockBoard1.build({row: row, column: column})
         block.attr('class', (d) => 'row' + row)
           .datum(() => ({row, column, columnHeight: blockSquareHeight, rowLength: blockSquareWidth}))
         // options.cb(block)
@@ -88,37 +68,39 @@
     }
   }
 
-  // TODO move to block_board.js
-  function addRandomBlock(bb) {
-    const randomAdjacentCoordinates = bb.getRandomAdjacentXY()
-    this.add({x: randomAdjacentCoordinates.x, y: randomAdjacentCoordinates.y})
-    let x = bb.calcXY(randomAdjacentCoordinates.x)
-    let y = bb.calcXY(randomAdjacentCoordinates.y)
-    const block = buildBlock({x: x, y: y})
-    block
-      .datum(() => ({
-        row: randomAdjacentCoordinates.y,
-        column: randomAdjacentCoordinates.x,
-        columnHeight: blockSquareHeight,
-        rowLength: blockSquareWidth
-      }))
+  let blockBoard1 = new BlockBoard({
+    divider,
+    dividerEvery: 0,
+    blockSize,
+    linePadding,
+    svgHeight: 250,
+    svgWidth: 500,
+    parent: '#svgParent1'
+  })
+
+  buildBlockSquare({bb: blockBoard1})
+  for (let i = 0; i < 100; i++) {
+    blockBoard1.moveRandomBlockRandomly({max: 10})
   }
 
-  let blockBoard = new BlockBoard({
+  const setupData = {
+    '0': [0],
+    '1': [1],
+    '2': [2],
+    '3': [0, 1,2,3]
+  }
+
+  let blockBoard2 = new BlockBoard({
+    data: setupData,
     divider,
     dividerEvery,
     blockSize,
     linePadding,
-    startingX: 0,
-    svgHeight,
-    svgWidth,
-    parent: '#svgParent'
+    svgHeight: 250,
+    svgWidth: 500,
+    parent: '#svgParent2'
   })
 
-  buildBlockSquare({bb: blockBoard})
-  for (let i = 0; i < 100; i++) {
-    blockBoard.moveRandomBlockRandomly({max: 10})
-  }
   </script>
   </body>
 </html>

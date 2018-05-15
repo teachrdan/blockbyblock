@@ -4,24 +4,23 @@ function BlockBoard (options) {
 
   this.blockSize = options.blockSize || 9 // pixels
   this.data = options.data
-  this.divider = options.divider || 20 // pixels
-  this.dividerEvery = options.dividerEvery || 10 // rows or columns
-  this.linePadding = options.linePadding || 1 // pixels
+  this.divider = options.divider // pixels
+  this.dividerEvery = options.dividerEvery // rows or columns
+  this.fill = options.fill || '#FF7518'
+  this.linePadding = options.linePadding // pixels
   this.opacity = options.opacity || 0.2
   this.parent = options.parent || 'body'
-  this.startingX = options.startingX || 0
   this.svgHeight = options.svgHeight || 500 // pixels
   this.svgWidth = options.svgWidth || 1000 // pixels
 
   this.svg = d3.select(this.parent)
     .attr('width', this.svgWidth).attr('height', this.svgHeight)
 
-  if (this.data) this.showData()
+  if (this.data) this.showData(this.data)
 }
 
-BlockBoard.prototype.showData = function () {
-  // TODO iterate over rows
-  Object.keys(this.data).forEach(row => {
+BlockBoard.prototype.showData = function (data) {
+  Object.keys(data).forEach(row => {
     this.data[row].forEach(column => {
       this.build({row, column})
     })
@@ -34,9 +33,11 @@ BlockBoard.prototype.clearBoard = function () {
 }
 
 BlockBoard.prototype.calcXY = function (num) {
-  let baseX = this.startingX + num * (this.blockSize + this.linePadding)
+  let baseX = num * (this.blockSize + this.linePadding)
+  if (this.dividerEvery === 0) return baseX
   return baseX + Math.floor(num / this.dividerEvery) * this.divider
 }
+
 BlockBoard.prototype._checkOpen = function (x, y) {
   return (!this.storage[x] || !this.storage[x].includes(parseInt(y)))
 }
@@ -49,7 +50,6 @@ BlockBoard.prototype.add = function (options) {
   return {row, column}
 }
 
-// TODO make this work with passed in starting data
 BlockBoard.prototype.build = function (options) {
   this.add({row: options.row, column: options.column})
   const x = this.calcXY(options.row)
@@ -62,7 +62,7 @@ BlockBoard.prototype.build = function (options) {
     .attr('x', x)
     .attr('y', y)
     .attr('opacity', this.opacity)
-    .attr('fill', '#FF7518')
+    .attr('fill', this.fill)
 }
 
 BlockBoard.prototype.remove = function (options) {
@@ -164,19 +164,15 @@ BlockBoard.prototype.buildBlock = function (options) {
     .attr('x', x)
     .attr('y', y)
     .attr('opacity', this.opacity)
-    .attr('fill', '#FF7518')
+    .attr('fill', this.fill)
 }
 
 BlockBoard.prototype.moveRandomBlockRandomly = function (options) {
-  // const delay = d3.scaleLinear()
-  //   .domain([0, options.max])
-  //   .range([1000, 1500]) // TODO make these variables
   const coordinates = this.getRandomBlock()
   const randomAdjacentCoordinates = this.getRandomAdjacentXY()
   this.remove({x: coordinates.x, y: coordinates.y})
   this.add({row: randomAdjacentCoordinates.x, column: randomAdjacentCoordinates.y})
   // const block = d3.select(`#row${coordinates.x}column${coordinates.y}`)
-  // console.log("block.attr('opacity')", block.attr('opacity'))
   d3.select(`#row${coordinates.x}column${coordinates.y}`)
     .attr('id', `row${randomAdjacentCoordinates.x}column${randomAdjacentCoordinates.y}`)
     .attr('opacity', 0.5)
