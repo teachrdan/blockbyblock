@@ -1,9 +1,11 @@
+// TODO refactor out svgWidth and svgHeight
+  // TODO create a better name for blocks of blocks; "Matrices"?
 const d3 = window.d3
 function BlockBoard (options) {
   this.storage = {} // storage['rowX'] = [columnY1, columnY2]
 
   this.blockSize = options.blockSize || 9 // pixels
-  this.data = options.data
+  this.data = options.data // obj formatted like this.storage
   this.divider = options.divider // pixels
   this.dividerEvery = options.dividerEvery // rows or columns
   this.fill = options.fill || '#FF7518'
@@ -12,17 +14,17 @@ function BlockBoard (options) {
   this.parent = options.parent || 'body'
   this.svgHeight = options.svgHeight || 500 // pixels
   this.svgWidth = options.svgWidth || 1000 // pixels
-
+  this.first = 'first'
   this.svg = d3.select(this.parent)
     .attr('width', this.svgWidth).attr('height', this.svgHeight)
 
-  if (this.data) this.showData(this.data)
+  if (this.data !== undefined && this.first !== undefined) this.showData(this.data[this.first])
 }
 
 BlockBoard.prototype.showData = function (data) {
-  Object.keys(data).forEach(row => {
-    this.data[row].forEach(column => {
-      this.build({row, column})
+  Object.keys(data).forEach(column => {
+    data[column].forEach(row => {
+      this.build({column, row})
     })
   })
 }
@@ -30,33 +32,38 @@ BlockBoard.prototype.showData = function (data) {
 BlockBoard.prototype.clearBoard = function () {
   this.storage = {}
   d3.select(this.parent).selectAll('*').remove()
+  return true
 }
 
 BlockBoard.prototype.calcXY = function (num) {
-  let baseX = num * (this.blockSize + this.linePadding)
-  if (this.dividerEvery === 0) return baseX
-  return baseX + Math.floor(num / this.dividerEvery) * this.divider
+  let base = num * (this.blockSize + this.linePadding)
+  if (this.dividerEvery === 0) return base
+  return base + Math.floor(num / this.dividerEvery) * this.divider
 }
 
 BlockBoard.prototype._checkOpen = function (x, y) {
   return (!this.storage[x] || !this.storage[x].includes(parseInt(y)))
 }
 
+// returns bool
 BlockBoard.prototype.add = function (options) {
-  const row = parseInt(options.row)
-  const column = parseInt(options.column)
+  const row = options.row
+  const column = options.column
   if (!this.storage[row]) this.storage[row] = []
+  if (this.storage[row].includes(column)) return false
   this.storage[row].push(column)
-  return {row, column}
+  return true
 }
 
 BlockBoard.prototype.build = function (options) {
-  this.add({row: options.row, column: options.column})
-  const x = this.calcXY(options.row)
-  const y =this.calcXY(options.column)
+  const row = parseInt(options.row)
+  const column = parseInt(options.column)
+  this.add({row, column})
+  const x = this.calcXY(row)
+  const y = this.calcXY(column)
 
   return this.svg.append('rect')
-    .attr('id', `row${options.row}column${options.column}`)
+    .attr('id', `row${row}column${column}`)
     .attr('height', this.blockSize)
     .attr('width', this.blockSize)
     .attr('x', x)
@@ -65,9 +72,11 @@ BlockBoard.prototype.build = function (options) {
     .attr('fill', this.fill)
 }
 
+// returns bool
 BlockBoard.prototype.remove = function (options) {
-  const x = parseInt(options.x)
-  const y = parseInt(options.y)
+  const x = options.x
+  const y = options.y
+  if (this.storage[x] && !this.storage[x].includes(y)) return false
   this.storage[x] = this.storage[x].filter(yVal => (yVal !== y))
   if (this.storage[x].length === 0) delete this.storage[x]
   return true
@@ -130,8 +139,6 @@ BlockBoard.prototype.getRandomAdjacentXY = function () {
   }
 }
 
-// TODO improve this "random" algo
-  // TODO count all blocks and choose one
 BlockBoard.prototype.getRandomBlock = function () {
   let found = false
   let x
@@ -150,15 +157,15 @@ BlockBoard.prototype.getRandomBlock = function () {
   return {x, y}
 }
 
-// TODO finish this
-  // builds passed in data or this.storage
 BlockBoard.prototype.buildBlock = function (options) {
-  const x = this.calcXY(options.row)
-  const y =this.calcXY(options.column)
+  const row = parseInt(options.row)
+  const column = parseInt(options.column)
+  const x = this.calcXY(row)
+  const y = this.calcXY(column)
 
   return this.svg.append('rect')
     .attr('class', 'block')
-    .attr('id', `row${options.row}column${options.column}`)
+    .attr('id', `row${row}column${column}`)
     .attr('height', this.blockSize)
     .attr('width', this.blockSize)
     .attr('x', x)
